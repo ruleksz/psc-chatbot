@@ -35,25 +35,117 @@ PSC Chatbot adalah aplikasi chatbot berbasis web yang memungkinkan pengguna mela
 ```text
 psc-chatbot/
 │
-├── client/              # Frontend
+├── client/                         # FRONTEND
+│   │
+│   ├── public/
+│   │   └── assets/
+│   │       ├── logo.png
+│   │       └── favicon.png
+│   │
 │   ├── src/
+│   │   │
+│   │   ├── assets/
+│   │   │   ├── images/
+│   │   │   └── icons/
+│   │   │
 │   │   ├── components/
+│   │   │   ├── Chat/
+│   │   │   │   ├── ChatWindow.jsx
+│   │   │   │   ├── ChatMessage.jsx
+│   │   │   │   ├── ChatInput.jsx
+│   │   │   │   ├── ChatHeader.jsx
+│   │   │   │   └── TypingIndicator.jsx
+│   │   │   │
+│   │   │   ├── Sidebar/
+│   │   │   │   ├── Sidebar.jsx
+│   │   │   │   ├── ConversationItem.jsx
+│   │   │   │   └── NewChatButton.jsx
+│   │   │   │
+│   │   │   ├── Common/
+│   │   │   │   ├── Button.jsx
+│   │   │   │   ├── Modal.jsx
+│   │   │   │   ├── Loading.jsx
+│   │   │   │   └── ErrorMessage.jsx
+│   │   │   │
+│   │   │   └── Layout/
+│   │   │       ├── Navbar.jsx
+│   │   │       └── Layout.jsx
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── Chat.jsx
+│   │   │   ├── Login.jsx
+│   │   │   └── NotFound.jsx
+│   │   │
 │   │   ├── services/
+│   │   │   ├── api.js
+│   │   │   ├── chatService.js
+│   │   │   └── conversationService.js
+│   │   │
 │   │   ├── hooks/
+│   │   │   ├── useChat.js
+│   │   │   └── useConversation.js
+│   │   │
+│   │   ├── context/
+│   │   │   └── ChatContext.jsx
+│   │   │
+│   │   ├── utils/
+│   │   │   ├── formatMessage.js
+│   │   │   └── formatDate.js
+│   │   │
+│   │   ├── constants/
+│   │   │   └── config.js
+│   │   │
 │   │   ├── App.jsx
-│   │   └── main.jsx
-│   └── package.json
+│   │   ├── main.jsx
+│   │   └── index.css
+│   │
+│   ├── .env
+│   ├── .env.example
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
 │
-├── service/             # Backend
+│
+├── service/                      # BACKEND
+│   │
 │   ├── src/
+│   │   │
 │   │   ├── routes/
+│   │   │   ├── chat.routes.js
+│   │   │   ├── conversation.routes.js
+│   │   │   └── index.js
+│   │   │
 │   │   ├── controllers/
+│   │   │   ├── chat.controller.js
+│   │   │   └── conversation.controller.js
+│   │   │
 │   │   ├── services/
-│   │   └── config/
+│   │   │   ├── ai.service.js
+│   │   │   ├── chat.service.js
+│   │   │   └── conversation.service.js
+│   │   │
+│   │   ├── config/
+│   │   │   ├── database.js
+│   │   │   └── env.js
+│   │   │
+│   │   ├── middleware/
+│   │   │   ├── error.middleware.js
+│   │   │   └── rateLimit.middleware.js
+│   │   │
+│   │   ├── utils/
+│   │   │   └── response.js
+│   │   │
+│   │   ├── app.js
+│   │   └── server.js
+│   │
+│   ├── .env
+│   ├── .env.example
 │   └── package.json
 │
+│
+├── .gitignore
 ├── README.md
-└── .gitignore
+└── package.json
 ```
 
 ---
