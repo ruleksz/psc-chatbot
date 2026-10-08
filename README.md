@@ -219,7 +219,9 @@ Contoh:
 git checkout develop
 git pull origin develop
 
-git checkout -b feature/chat-interface
+git checkout -b feature/frontend
+git checkout -b feature/backend
+git checkout -b feature/chatbot
 ```
 
 Setelah selesai:
@@ -227,7 +229,7 @@ Setelah selesai:
 ```bash
 git add .
 git commit -m "feat: add chat interface"
-git push origin feature/chat-interface
+git push origin feature/chatbot
 ```
 
 Kemudian buat **Pull Request** ke `develop`.
