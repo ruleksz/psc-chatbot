@@ -1,3 +1,14 @@
+## ⚠️ Important
+
+- Jangan commit `.env`
+- Jangan memasukkan API key ke frontend
+- Jangan langsung push ke `main`
+- Setiap fitur menggunakan branch sendiri
+- Selalu pull `develop` sebelum mulai bekerja
+- Semua fitur harus melalui review sebelum masuk `main`
+
+---
+
 # 🤖 PSC Chatbot
 
 Web-based chatbot built with **React + Vite**.
@@ -294,17 +305,6 @@ Done
 - [ ] Bug fixing
 - [ ] Responsive design
 - [ ] Deployment
-
----
-
-## ⚠️ Important
-
-- Jangan commit `.env`
-- Jangan memasukkan API key ke frontend
-- Jangan langsung push ke `main`
-- Setiap fitur menggunakan branch sendiri
-- Selalu pull `develop` sebelum mulai bekerja
-- Semua fitur harus melalui review sebelum masuk `main`
 
 ---
 
