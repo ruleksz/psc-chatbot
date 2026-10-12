@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import chatRoutes from "./routes/chat.routes.js";
+import conversationRoutes from "./routes/conversation.routes.js";
 
 const app = express();
 
@@ -18,6 +19,9 @@ app.get("/", (req, res) => {
 
 // Chat routes
 app.use("/api/chat", chatRoutes);
+
+// Endpoint database percakapan
+app.use("/api/conversations", conversationRoutes);
 
 // 404 handler
 app.use((req, res) => {
