@@ -8,6 +8,8 @@ function Sidebar({
   onClose,
   onNewConversation,
   onSelectConversation,
+  user,
+  onLogout,
 }) {
   return (
     <>
@@ -84,8 +86,36 @@ function Sidebar({
           )}
         </div>
 
-        <div className="mt-5 border-t border-slate-800 px-2 pt-4 text-xs leading-5 text-slate-400">
-          Riwayat tersimpan sementara di sesi ini.
+        {/* User Info & Logout */}
+        <div className="mt-5 border-t border-slate-800 px-2 pt-4">
+          {user && (
+            <div className="mb-3 flex items-center gap-3 rounded-lg bg-slate-800 p-2">
+              {user.picture && (
+                <img
+                  src={user.picture}
+                  alt={user.name}
+                  className="size-8 rounded-full"
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="truncate text-xs font-medium text-white">
+                  {user.name}
+                </p>
+                <p className="truncate text-xs text-slate-400">
+                  {user.email}
+                </p>
+              </div>
+            </div>
+          )}
+          <button
+            onClick={onLogout}
+            className="w-full rounded-lg bg-slate-700 px-3 py-2 text-xs font-medium text-white transition hover:bg-slate-600"
+          >
+            Logout
+          </button>
+          <p className="mt-3 text-xs leading-5 text-slate-400">
+            Riwayat tersimpan sementara di sesi ini.
+          </p>
         </div>
       </aside>
     </>

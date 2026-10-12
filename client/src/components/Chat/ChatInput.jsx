@@ -1,13 +1,13 @@
 import { useState } from 'react'
 
-function ChatInput({ onSendMessage }) {
+function ChatInput({ onSendMessage, isDisabled = false }) {
   const [message, setMessage] = useState('')
 
   function submitMessage(event) {
     event.preventDefault()
     const content = message.trim()
 
-    if (!content) {
+    if (!content || isDisabled) {
       return
     }
 
@@ -16,7 +16,7 @@ function ChatInput({ onSendMessage }) {
   }
 
   function handleKeyDown(event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === 'Enter' && !event.shiftKey && !isDisabled) {
       event.preventDefault()
       event.currentTarget.form?.requestSubmit()
     }
@@ -36,31 +36,41 @@ function ChatInput({ onSendMessage }) {
         onChange={(event) => setMessage(event.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Tulis pesan di sini..."
+        disabled={isDisabled}
         rows={2}
-        className="max-h-40 min-h-12 w-full resize-y bg-transparent px-3 py-2 text-sm leading-6 text-slate-900 outline-none placeholder:text-slate-400"
+        className="max-h-40 min-h-12 w-full resize-y bg-transparent px-3 py-2 text-sm leading-6 text-slate-900 outline-none placeholder:text-slate-400 disabled:opacity-50"
       />
       <div className="flex items-center justify-between gap-3 px-2 pb-1">
         <p className="text-xs text-slate-500">Enter untuk kirim · Shift+Enter untuk baris baru</p>
         <button
           type="submit"
-          disabled={!message.trim()}
+          disabled={!message.trim() || isDisabled}
           className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-sky-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:bg-slate-300"
         >
-          Kirim
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 20 20"
-            fill="none"
-            className="size-4"
-          >
-            <path
-              d="M3.5 10h12m0 0-5-5m5 5-5 5"
-              stroke="currentColor"
-              strokeWidth="1.7"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          {isDisabled ? (
+            <>
+              <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+              Mengirim...
+            </>
+          ) : (
+            <>
+              Kirim
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                fill="none"
+                className="size-4"
+              >
+                <path
+                  d="M3.5 10h12m0 0-5-5m5 5-5 5"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </>
+          )}
         </button>
       </div>
     </form>

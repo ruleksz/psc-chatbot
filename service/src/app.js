@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import chatRoutes from "./routes/chat.routes.js";
 import conversationRoutes from "./routes/conversation.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
 
@@ -16,6 +17,9 @@ app.get("/", (req, res) => {
         message: "PSC Chatbot API is running 🚀"
     });
 });
+
+// Auth routes (no middleware required)
+app.use("/api/auth", authRoutes);
 
 // Chat routes
 app.use("/api/chat", chatRoutes);
