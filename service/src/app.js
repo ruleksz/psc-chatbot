@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import chatRoutes from "./routes/chat.routes.js";
 
 const app = express();
 
@@ -14,6 +15,9 @@ app.get("/", (req, res) => {
         message: "PSC Chatbot API is running 🚀"
     });
 });
+
+// Chat routes
+app.use("/api/chat", chatRoutes);
 
 // 404 handler
 app.use((req, res) => {
