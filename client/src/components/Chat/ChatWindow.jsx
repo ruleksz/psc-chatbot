@@ -9,6 +9,7 @@ function ChatWindow({
   onToggleSidebar,
   isSidebarOpen,
   isTyping = false,
+  error = null,
 }) {
   return (
     <main className="flex min-h-screen min-w-0 flex-1 flex-col bg-slate-50 text-slate-900">
@@ -21,6 +22,13 @@ function ChatWindow({
         className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 sm:px-8"
         aria-label="Percakapan"
       >
+        {error && (
+          <div className="mt-4 rounded-lg bg-red-50 p-4 text-sm text-red-700 border border-red-200">
+            <p className="font-semibold">Error:</p>
+            <p>{error}</p>
+          </div>
+        )}
+
         <div
           className="flex flex-1 flex-col gap-6 overflow-y-auto py-8"
           aria-live="polite"
@@ -35,8 +43,7 @@ function ChatWindow({
                 Mulai percakapan
               </h2>
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                Ketik pesan pada kolom di bawah untuk memulai. Pesan saat ini
-                hanya tampil di frontend dan belum dikirim ke chatbot.
+                Ketik pesan pada kolom di bawah untuk memulai. Pesan akan dikirim ke chatbot dan disimpan dalam database.
               </p>
             </div>
           ) : (
@@ -48,9 +55,9 @@ function ChatWindow({
         </div>
 
         <div className="sticky bottom-0 bg-slate-50 pb-5 pt-3">
-          <ChatInput onSendMessage={onSendMessage} />
+          <ChatInput onSendMessage={onSendMessage} isDisabled={isTyping} />
           <p className="mt-3 text-center text-xs text-slate-500">
-            Integrasi backend dan data token akan ditambahkan setelah API siap.
+            Powered by Groq API • Data tersimpan di database
           </p>
         </div>
       </section>
