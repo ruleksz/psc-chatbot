@@ -32,11 +32,20 @@ export async function saveMessage({
         ]
     );
 
+    const conversationTitle =
+        content.length > 36
+            ? `${content.slice(0, 36)}...`
+            : content;
+
     await db.execute(
         `UPDATE conversations
-         SET updated_at = CURRENT_TIMESTAMP
+         SET title = CASE
+                WHEN ? = 'user' AND title = 'Percakapan Baru' THEN ?
+                ELSE title
+             END,
+             updated_at = CURRENT_TIMESTAMP
          WHERE id = ?`,
-        [conversationId]
+        [role, conversationTitle, conversationId]
     );
 
     return result.insertId;

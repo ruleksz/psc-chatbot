@@ -71,10 +71,14 @@ export async function getConversationMessages(conversationId) {
 
   const json = await response.json();
   
-  // Handle both formats: direct messages array or nested in response
+  const messages = json.messages || json.data
+  if (!json.success || !Array.isArray(messages)) {
+    throw new Error(json.message || 'Format riwayat percakapan tidak valid')
+  }
+
   return {
     success: true,
-    data: json.messages || json.data || []
+    data: messages
   };
 }
 

@@ -12,14 +12,14 @@ function ChatWindow({
   error = null,
 }) {
   return (
-    <main className="flex min-h-screen min-w-0 flex-1 flex-col bg-slate-50 text-slate-900">
+    <main className="flex h-dvh min-h-0 min-w-0 flex-1 flex-col bg-slate-50 text-slate-900">
       <ChatHeader
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={onToggleSidebar}
       />
 
       <section
-        className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 sm:px-8"
+        className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col px-4 sm:px-8"
         aria-label="Percakapan"
       >
         {error && (
@@ -30,7 +30,7 @@ function ChatWindow({
         )}
 
         <div
-          className="flex flex-1 flex-col gap-6 overflow-y-auto py-8"
+          className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto py-8"
           aria-live="polite"
           aria-relevant="additions text"
         >

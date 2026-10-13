@@ -3,7 +3,13 @@ import ChatWindow from './components/Chat/ChatWindow.jsx'
 import Sidebar from './components/Sidebar/Sidebar.jsx'
 import Layout from './components/Layout/Layout.jsx'
 import FirebaseLoginPage from './pages/FirebaseLoginPage.jsx'
-import { sendMessage, getConversations, createConversation as createConversationAPI, getConversationMessages } from './services/api.js'
+import {
+  sendMessage,
+  getConversations,
+  createConversation as createConversationAPI,
+  getConversationMessages,
+  deleteConversation as deleteConversationAPI,
+} from './services/api.js'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -13,6 +19,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isTyping, setIsTyping] = useState(false)
+  const [deletingConversationId, setDeletingConversationId] = useState(null)
   const [error, setError] = useState(null)
 
   const activeConversation = conversations.find(
@@ -85,23 +92,26 @@ function App() {
   async function loadConversationMessages(conversationId) {
     try {
       const response = await getConversationMessages(conversationId)
-      if (response.success && response.data) {
-        const formattedMessages = response.data.map((msg) => ({
-          id: msg.id,
-          role: msg.role,
-          content: msg.content,
-          sources: msg.sources ? (typeof msg.sources === 'string' ? JSON.parse(msg.sources) : msg.sources) : [],
-        }))
-        setConversations((currentConversations) =>
-          currentConversations.map((conv) => 
-            conv.id === conversationId 
-              ? { ...conv, messages: formattedMessages }
-              : conv
-          )
-        )
-      }
+      const formattedMessages = response.data.map((msg) => ({
+        id: msg.id,
+        role: msg.role,
+        content: msg.content,
+        sources: msg.sources
+          ? typeof msg.sources === 'string'
+            ? JSON.parse(msg.sources)
+            : msg.sources
+          : [],
+      }))
+      setConversations((currentConversations) =>
+        currentConversations.map((conversation) =>
+          conversation.id === conversationId
+            ? { ...conversation, messages: formattedMessages }
+            : conversation,
+        ),
+      )
     } catch (err) {
       console.error('Failed to load conversation messages:', err)
+      setError(err.message || 'Gagal memuat pesan percakapan')
     }
   }
 
@@ -193,9 +203,43 @@ function App() {
 
   function handleSelectConversation(conversationId) {
     setActiveConversationId(conversationId)
+    setError(null)
     setIsSidebarOpen(false)
-    // Load messages for selected conversation
     loadConversationMessages(conversationId)
+  }
+
+  async function handleDeleteConversation(conversationId) {
+    const conversation = conversations.find((item) => item.id === conversationId)
+    if (!conversation) return
+
+    const confirmed = window.confirm(
+      `Hapus percakapan "${conversation.title}"? Riwayat ini tidak dapat dipulihkan.`,
+    )
+    if (!confirmed) return
+
+    try {
+      setError(null)
+      setDeletingConversationId(conversationId)
+      await deleteConversationAPI(conversationId)
+
+      const remainingConversations = conversations.filter(
+        (item) => item.id !== conversationId,
+      )
+      setConversations(remainingConversations)
+
+      if (activeConversationId === conversationId) {
+        const nextConversation = remainingConversations[0]
+        setActiveConversationId(nextConversation?.id ?? null)
+        if (nextConversation) {
+          await loadConversationMessages(nextConversation.id)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to delete conversation:', err)
+      setError(err.message || 'Gagal menghapus percakapan')
+    } finally {
+      setDeletingConversationId(null)
+    }
   }
 
   if (isLoading) {
@@ -225,9 +269,10 @@ function App() {
           onClose={() => setIsSidebarOpen(false)}
           onNewConversation={handleNewConversation}
           onSelectConversation={handleSelectConversation}
+          onDeleteConversation={handleDeleteConversation}
+          deletingConversationId={deletingConversationId}
           user={user}
           onLogout={handleLogout}
-          error={error}
         />
       }
     >
