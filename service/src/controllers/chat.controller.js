@@ -91,11 +91,17 @@ export async function postChat(req, res) {
             });
         } catch (error) {
             console.error("AI error:", error);
+            console.error("Full error details:", {
+                code: error.code,
+                message: error.message,
+                stack: error.stack
+            });
 
             return res.status(502).json({
                 success: false,
                 conversation_id: conversationId,
-                message: "AI gagal memproses pesan. Pesan pengguna sudah tersimpan."
+                message: "AI gagal memproses pesan. Pesan pengguna sudah tersimpan.",
+                error_code: error.code
             });
         }
 

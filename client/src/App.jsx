@@ -3,7 +3,7 @@ import ChatWindow from './components/Chat/ChatWindow.jsx'
 import Sidebar from './components/Sidebar/Sidebar.jsx'
 import Layout from './components/Layout/Layout.jsx'
 import FirebaseLoginPage from './pages/FirebaseLoginPage.jsx'
-import { sendMessage, getConversations, createConversation as createConversationAPI } from './services/api.js'
+import { sendMessage, getConversations, createConversation as createConversationAPI, getConversationMessages } from './services/api.js'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -64,12 +64,14 @@ function App() {
         const formattedConversations = response.data.map((conv) => ({
           id: conv.id,
           title: conv.title,
-          messages: conv.messages || [],
+          messages: [],
           updatedAt: new Date(conv.updated_at).getTime(),
         }))
         setConversations(formattedConversations)
         if (formattedConversations.length > 0) {
           setActiveConversationId(formattedConversations[0].id)
+          // Load messages for first conversation
+          await loadConversationMessages(formattedConversations[0].id)
         }
       }
     } catch (err) {
@@ -77,6 +79,29 @@ function App() {
       setError('Gagal memuat percakapan. Pastikan server berjalan di http://localhost:5000')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  async function loadConversationMessages(conversationId) {
+    try {
+      const response = await getConversationMessages(conversationId)
+      if (response.success && response.data) {
+        const formattedMessages = response.data.map((msg) => ({
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
+          sources: msg.sources ? (typeof msg.sources === 'string' ? JSON.parse(msg.sources) : msg.sources) : [],
+        }))
+        setConversations((currentConversations) =>
+          currentConversations.map((conv) => 
+            conv.id === conversationId 
+              ? { ...conv, messages: formattedMessages }
+              : conv
+          )
+        )
+      }
+    } catch (err) {
+      console.error('Failed to load conversation messages:', err)
     }
   }
 
@@ -169,6 +194,8 @@ function App() {
   function handleSelectConversation(conversationId) {
     setActiveConversationId(conversationId)
     setIsSidebarOpen(false)
+    // Load messages for selected conversation
+    loadConversationMessages(conversationId)
   }
 
   if (isLoading) {

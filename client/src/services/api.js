@@ -69,7 +69,13 @@ export async function getConversationMessages(conversationId) {
     throw new Error(error.message || 'Gagal mengambil pesan percakapan');
   }
 
-  return response.json();
+  const json = await response.json();
+  
+  // Handle both formats: direct messages array or nested in response
+  return {
+    success: true,
+    data: json.messages || json.data || []
+  };
 }
 
 export async function deleteConversation(conversationId) {
