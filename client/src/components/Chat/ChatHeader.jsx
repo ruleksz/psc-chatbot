@@ -5,7 +5,6 @@ function ChatHeader({ isSidebarOpen, onToggleSidebar }) {
     <Navbar
       title="PSC Chatbot"
       subtitle="Asisten percakapan"
-      status="Backend belum terhubung"
       isSidebarOpen={isSidebarOpen}
       onToggleSidebar={onToggleSidebar}
     />

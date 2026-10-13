@@ -8,6 +8,8 @@ function Sidebar({
   onClose,
   onNewConversation,
   onSelectConversation,
+  onDeleteConversation,
+  deletingConversationId,
   user,
   onLogout,
 }) {
@@ -25,7 +27,7 @@ function Sidebar({
       <aside
         id="conversation-sidebar"
         aria-label="Daftar percakapan"
-        className={`fixed inset-y-0 left-0 z-40 flex w-72 shrink-0 flex-col border-r border-slate-800 bg-slate-900 px-4 py-5 text-white transition-transform duration-200 md:static md:z-auto md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex h-dvh w-72 shrink-0 flex-col border-r border-slate-800 bg-slate-900 px-4 py-5 text-white transition-transform duration-200 md:sticky md:top-0 md:z-auto md:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -75,6 +77,8 @@ function Sidebar({
                     conversation={conversation}
                     isActive={conversation.id === activeConversationId}
                     onSelect={onSelectConversation}
+                    onDelete={onDeleteConversation}
+                    isDeleting={conversation.id === deletingConversationId}
                   />
                 ))}
               </ul>
@@ -114,7 +118,7 @@ function Sidebar({
             Logout
           </button>
           <p className="mt-3 text-xs leading-5 text-slate-400">
-            Riwayat tersimpan sementara di sesi ini.
+            Riwayat percakapan tersimpan di database.
           </p>
         </div>
       </aside>
