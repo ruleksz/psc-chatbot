@@ -1,3 +1,6 @@
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+
 function ChatMessage({ message }) {
   const isUser = message.role === 'user'
   const usage = message.usage
@@ -24,7 +27,15 @@ function ChatMessage({ message }) {
               : 'rounded-bl-md border border-slate-200 bg-white text-slate-800'
           }`}
         >
-          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+          {isUser ? (
+  <p className="whitespace-pre-wrap break-words">{message.content}</p>
+) : (
+  <div className="markdown-body break-words">
+    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+      {message.content}
+    </ReactMarkdown>
+  </div>
+)}
         </div>
 
         {usage && !isUser && (
