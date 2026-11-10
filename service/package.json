@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "test:eval": "node src/scripts/evaluate-rag.js",
+    "ingest": "node src/scripts/ingest-rag-documents.js",
+    "ingest:dry": "node src/scripts/ingest-rag-documents.js --dry-run"
   },
   "keywords": [],
   "author": "",

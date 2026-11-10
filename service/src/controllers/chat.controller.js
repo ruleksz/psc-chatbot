@@ -1,4 +1,3 @@
-
 import { generateChatReply } from "../service/chat.service.js";
 
 import {
@@ -81,7 +80,7 @@ export async function postChat(req, res) {
             content: message.trim()
         });
 
-        // Proses menggunakan AI yang sudah ada
+        // Proses menggunakan AI (termasuk RAG internal & pencarian web)
         let result;
 
         try {
@@ -111,15 +110,17 @@ export async function postChat(req, res) {
             role: "assistant",
             content: result.reply,
             model: result.model || null,
-            sources: result.sources || []
+            sources: result.sources || [],
+            ragSources: result.rag_sources || []
         });
 
-        // Kirim hasil ke Postman
         return res.json({
             success: true,
             conversation_id: conversationId,
             reply: result.reply,
-            sources: result.sources || []
+            sources: result.sources || [],
+            rag_sources: result.rag_sources || [],
+            usage: result.usage || null
         });
 
     } catch (error) {

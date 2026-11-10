@@ -149,12 +149,13 @@ function App() {
       const response = await sendMessage(content, activeConversationId)
 
       if (response.success) {
-        const assistantMessage = {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: response.reply,
-          sources: response.sources || [],
-        }
+    const assistantMessage = {
+  id: crypto.randomUUID(),
+  role: 'assistant',
+  content: response.reply,
+  sources: response.sources || [],
+  usage: response.usage || null,
+}
 
         setConversations((currentConversations) =>
           currentConversations.map((conversation) => {

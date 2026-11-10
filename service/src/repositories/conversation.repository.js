@@ -1,5 +1,18 @@
 import db from "../config/database.js";
 
+let hasRagSourcesColumn = null;
+
+async function checkRagSourcesColumn() {
+    if (hasRagSourcesColumn !== null) return hasRagSourcesColumn;
+    try {
+        const [cols] = await db.execute("SHOW COLUMNS FROM messages LIKE 'rag_sources'");
+        hasRagSourcesColumn = cols.length > 0;
+    } catch {
+        hasRagSourcesColumn = false;
+    }
+    return hasRagSourcesColumn;
+}
+
 // 1. MEMBUAT PERCAKAPAN BARU
 export async function createConversation(userId, title) {
     const [result] = await db.execute(
@@ -17,20 +30,43 @@ export async function saveMessage({
     role,
     content,
     model = null,
-    sources = []
+    sources = [],
+    ragSources = []
 }) {
-    const [result] = await db.execute(
-        `INSERT INTO messages
-         (conversation_id, role, content, model, sources)
-         VALUES (?, ?, ?, ?, ?)`,
-        [
-            conversationId,
-            role,
-            content,
-            model,
-            JSON.stringify(sources)
-        ]
-    );
+    const canSaveRagSources = await checkRagSourcesColumn();
+
+    let insertId;
+
+    if (canSaveRagSources) {
+        const [result] = await db.execute(
+            `INSERT INTO messages
+             (conversation_id, role, content, model, sources, rag_sources)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+                conversationId,
+                role,
+                content,
+                model,
+                JSON.stringify(sources),
+                JSON.stringify(ragSources)
+            ]
+        );
+        insertId = result.insertId;
+    } else {
+        const [result] = await db.execute(
+            `INSERT INTO messages
+             (conversation_id, role, content, model, sources)
+             VALUES (?, ?, ?, ?, ?)`,
+            [
+                conversationId,
+                role,
+                content,
+                model,
+                JSON.stringify(sources)
+            ]
+        );
+        insertId = result.insertId;
+    }
 
     const conversationTitle =
         content.length > 36
@@ -48,7 +84,7 @@ export async function saveMessage({
         [role, conversationTitle, conversationId]
     );
 
-    return result.insertId;
+    return insertId;
 }
 
 // 3. MENGAMBIL SEMUA RIWAYAT PERCAKAPAN
@@ -66,18 +102,26 @@ export async function getConversations(userId) {
 
 // 4. MENGAMBIL DETAIL PESAN
 export async function getMessages(conversationId, userId) {
-    const [rows] = await db.execute(
-        `SELECT m.id, m.role, m.content,
-                m.model, m.sources, m.created_at
-         FROM messages m
-         INNER JOIN conversations c
-            ON m.conversation_id = c.id
-         WHERE m.conversation_id = ?
-           AND c.user_id = ?
-         ORDER BY m.id ASC`,
-        [conversationId, userId]
-    );
+    const canSelectRagSources = await checkRagSourcesColumn();
+    const selectQuery = canSelectRagSources
+        ? `SELECT m.id, m.role, m.content,
+                  m.model, m.sources, m.rag_sources, m.created_at
+           FROM messages m
+           INNER JOIN conversations c
+              ON m.conversation_id = c.id
+           WHERE m.conversation_id = ?
+             AND c.user_id = ?
+           ORDER BY m.id ASC`
+        : `SELECT m.id, m.role, m.content,
+                  m.model, m.sources, m.created_at
+           FROM messages m
+           INNER JOIN conversations c
+              ON m.conversation_id = c.id
+           WHERE m.conversation_id = ?
+             AND c.user_id = ?
+           ORDER BY m.id ASC`;
 
+    const [rows] = await db.execute(selectQuery, [conversationId, userId]);
     return rows;
 }
 
