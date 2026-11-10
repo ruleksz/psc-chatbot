@@ -1,12 +1,15 @@
 {
   "name": "psc-chatbot-service",
   "version": "1.0.0",
-  "description": "PSC Esports Assistant backend using Groq API",
+  "description": "PSC Esports Assistant backend using Groq API and RAG",
   "main": "server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "test:eval": "node src/scripts/evaluate-rag.js",
+    "ingest": "node src/scripts/ingest-rag-documents.js",
+    "ingest:dry": "node src/scripts/ingest-rag-documents.js --dry-run"
   },
   "keywords": [],
   "author": "",

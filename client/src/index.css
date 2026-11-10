@@ -1,1 +1,45 @@
 @import "tailwindcss";
+
+.markdown-body :where(p) {
+  margin: 0 0 0.75rem;
+}
+
+.markdown-body :where(p:last-child) {
+  margin-bottom: 0;
+}
+
+.markdown-body :where(strong) {
+  font-weight: 700;
+}
+
+.markdown-body :where(ul, ol) {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown-body :where(ul) {
+  list-style: disc;
+}
+
+.markdown-body :where(ol) {
+  list-style: decimal;
+}
+
+.markdown-body :where(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.875rem;
+}
+
+.markdown-body :where(th, td) {
+  border: 1px solid #cbd5e1;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.markdown-body :where(th) {
+  background: #f1f5f9;
+  font-weight: 700;
+}
