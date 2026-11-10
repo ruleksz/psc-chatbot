@@ -1,7 +1,7 @@
 {
   "name": "psc-chatbot-service",
   "version": "1.0.0",
-  "description": "PSC Esports Assistant backend using Groq API and RAG",
+  "description": "PSC Esports Assistant backend using Gemini API",
   "main": "server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -16,13 +16,13 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@google/genai": "^2.29.1",
     "cors": "^2.8.6",
     "dotenv": "^18.0.6",
     "express": "^5.2.1",
     "google-auth-library": "^11.2.0",
     "jsonwebtoken": "^9.0.3",
-    "mysql2": "^3.24.5",
-    "openai": "^7.32.0"
+    "mysql2": "^3.24.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
