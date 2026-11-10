@@ -184,9 +184,9 @@ User
 ## 🚀 How to Run
 
 ### Prerequisites
-- Node.js v16+
+- Node.js v20+
 - MySQL/MariaDB running locally
-- Groq API Key (dari https://console.groq.com)
+- Gemini API Key (dari https://aistudio.google.com/apikey)
 
 ### Quick Start (Recommended)
 
@@ -232,9 +232,17 @@ DB_PASSWORD=your_mysql_password
 DB_NAME=psc_chatbot
 
 PORT=5000
-GROQ_API_KEY=your_groq_api_key
-GROQ_MODEL=openai/gpt-oss-20b
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash
+
+TAVILY_API_KEY=your_tavily_api_key
+OFFICIAL_SOURCE_MAX_RESULTS=5
+REQUIRE_OFFICIAL_SOURCES=false
 ```
+
+Gemini digunakan untuk klasifikasi topik dan membuat jawaban. Tavily tetap digunakan
+untuk mencari sumber web resmi; isi `TAVILY_API_KEY` agar fitur pencarian sumber aktif.
+Kedua API key hanya disimpan di `service/.env`, bukan di frontend.
 
 #### 2. Setup Frontend (.env)
 ```bash

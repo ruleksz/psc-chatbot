@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 import {
     buildOfficialSourceContext,
     findOfficialSources,
@@ -180,7 +180,7 @@ function getVerifiedEsportsAnswer(message) {
     return null;
 }
 
-async function isEsportsRelated(groq, model, message, history) {
+async function isEsportsRelated(gemini, model, message, history) {
     const safeHistory = Array.isArray(history) ? history : [];
     const recentHistory = safeHistory
         .slice(-6)
@@ -194,52 +194,53 @@ async function isEsportsRelated(groq, model, message, history) {
         }));
 
     try {
-        const completion = await groq.chat.completions.create({
+        const completion = await gemini.models.generateContent({
             model,
-            messages: [
-                {
-                    role: "system",
-                    content: TOPIC_CLASSIFIER_PROMPT,
-                },
-                ...recentHistory,
+            contents: [
+                ...recentHistory.map(({ role, content }) => ({
+                    role: role === "assistant" ? "model" : "user",
+                    parts: [{ text: content }],
+                })),
                 {
                     role: "user",
-                    content:
-                        "Klasifikasikan topik pesan terbaru berikut saja. Jangan menjawabnya.\n\n" +
-                        String(message),
+                    parts: [{
+                        text:
+                            "Klasifikasikan topik pesan terbaru berikut saja. Jangan menjawabnya.\n\n" +
+                            String(message),
+                    }],
                 },
             ],
-            temperature: 0,
-            response_format: {
-                type: "json_object",
+            config: {
+                systemInstruction: TOPIC_CLASSIFIER_PROMPT,
+                temperature: 0,
+                responseMimeType: "application/json",
             },
         });
 
-  
-const raw = completion.choices[0]?.message?.content || "{}";
+        const raw = completion.text || "{}";
 
-console.log("========== TOPIC CLASSIFICATION ==========");
-console.log("User message:", message);
-console.log("Raw classifier response:", raw);
+        console.log("========== TOPIC CLASSIFICATION ==========");
+        console.log("User message:", message);
+        console.log("Raw classifier response:", raw);
 
-const result = JSON.parse(raw);
+        const result = JSON.parse(raw);
 
-if (typeof result.in_scope !== "boolean") {
-    throw new Error("Format respons classifier tidak valid");
-}
+        if (typeof result.in_scope !== "boolean") {
+            throw new Error("Format respons classifier tidak valid");
+        }
 
-console.log("Is esports related:", result.in_scope);
-console.log("==========================================");
+        console.log("Is esports related:", result.in_scope);
+        console.log("==========================================");
 
-return result.in_scope;
+        return result.in_scope;
     } catch (error) {
-    console.error("Gagal melakukan klasifikasi topik:", {
-        message: error.message,
-        status: error.status,
-        code: error.code
-    });
+        console.error("Gagal melakukan klasifikasi topik:", {
+            message: error.message,
+            status: error.status,
+            code: error.code
+        });
 
-    throw error;
+        throw error;
     }
 }
 
@@ -250,17 +251,14 @@ export async function generateChatReply({ message, history = [] }) {
         throw error;
     }
 
-    if (!process.env.GROQ_API_KEY) {
-        const error = new Error("GROQ_API_KEY belum diatur di file .env.");
+    if (!process.env.GEMINI_API_KEY) {
+        const error = new Error("GEMINI_API_KEY belum diatur di file .env.");
         error.code = "MISSING_API_KEY";
         throw error;
     }
 
-    const model = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
-    const groq = new OpenAI({
-        apiKey: process.env.GROQ_API_KEY,
-        baseURL: "https://api.groq.com/openai/v1",
-    });
+    const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
     // Tahap 1: jawab fakta esports yang sudah diverifikasi dan dikenali
     // secara spesifik. Pola ini hanya cocok untuk pertanyaan M1/M-Series.
@@ -271,7 +269,7 @@ export async function generateChatReply({ message, history = [] }) {
 
     // Tahap 2: tolak pertanyaan di luar cakupan esports.
     const inScope = await isEsportsRelated(
-        groq,
+        gemini,
         model,
         message,
         Array.isArray(history) ? history : []
@@ -350,22 +348,34 @@ export async function generateChatReply({ message, history = [] }) {
 
     let completion;
     try {
-        completion = await groq.chat.completions.create({
+        completion = await gemini.models.generateContent({
             model,
-            messages,
-            temperature: 0.2,
+            contents: [
+                ...recentHistory.map(({ role, content }) => ({
+                    role: role === "assistant" ? "model" : "user",
+                    parts: [{ text: content }],
+                })),
+                {
+                    role: "user",
+                    parts: [{ text: messages[messages.length - 1].content }],
+                },
+            ],
+            config: {
+                systemInstruction: messages[0].content,
+                temperature: 0.2,
+            },
         });
     } catch (cause) {
         const error = new Error(
-            cause?.message || "Permintaan ke Groq API gagal."
+            cause?.message || "Permintaan ke Gemini API gagal."
         );
-        error.code = "GROQ_API_ERROR";
+        error.code = "GEMINI_API_ERROR";
         throw error;
     }
 
-    const reply = completion.choices[0]?.message?.content?.trim();
+    const reply = completion.text?.trim();
     if (!reply) {
-        const error = new Error("Groq tidak menghasilkan jawaban teks.");
+        const error = new Error("Gemini tidak menghasilkan jawaban teks.");
         error.code = "EMPTY_AI_RESPONSE";
         throw error;
     }
